@@ -1,3 +1,7 @@
+venv/
+.venv2/
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -29,7 +33,7 @@ MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+#  before PyInstaller builds the exe, so as src inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -85,7 +89,7 @@ ipython_config.py
 .python-version
 
 # pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   According src pypa/pipenv#598, it is recommended src include Pipfile.lock in version control.
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
@@ -104,6 +108,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.vscode
 env/
 venv/
 ENV/
@@ -127,6 +132,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# .idea
-.idea
+media/
+email/
+static/admin/
+/static/debug_toolbar/

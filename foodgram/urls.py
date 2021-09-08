@@ -1,34 +1,23 @@
-from django.conf import settings
-from django.conf.urls.static import static
+import debug_toolbar
+from django.conf.urls import handler404, handler500
 from django.contrib import admin
-from django.urls import path, include
-from . import views
+from django.urls import include, path
+
+from foodgram import views
+
+handler404 = "foodgram.views.page_not_found"  # noqa
+handler500 = "foodgram.views.server_error"  # noqa
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('about/', include('django.contrib.flatpages.urls')),
-    path('accounts/', include('users.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('', views.index_view, name='index'),
-    path('recipes/', include('api.urls')),
-    path('purchases', views.shopping_list_view, name='shopping_list'),
-    path('purchases/<int:id>/', views.shopping_list_item_delete,
-         name='shoplist_delete'),
-    path('purchases/download/', views.shopping_list_download_view,
-         name='shoplist_download'),
-    path('favorites', views.favorite_recipe_view, name='favorites'),
-    path('favorites/<int:id>/', views.favorite_item_delete,
-         name='favorite_delete'),
-    path('profile/<slug:slug>/', views.profile_view, name='profile'),
-    path('subscriptions', views.subscriptions_index, name='subscriptions'),
-    path('subscriptions/<int:id>/follow/', views.follow_view, name='follows'),
-    path('subscriptions/<int:id>/unfollow/', views.unfollow_view,
-         name='unfollow'),
+    path("accounts/", include("users.urls")),
+    path("", include("recipe.urls")),
+    path("api/", include("api.urls")),
+    path("404/", views.page_not_found, name="e404"),
+    path("500/", views.server_error, name="e500"),
+    path("tech/", views.tech, name="tech"),
+]
 
-    ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+urlpatterns += [
+    path('__debug__/', include(debug_toolbar.urls)),
+]

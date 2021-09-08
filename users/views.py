@@ -1,18 +1,50 @@
-from django.contrib.auth import login
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, FormView, TemplateView
 
-from users.forms import CreationForm
+from .forms import CreationForm
 
 
-def sign_up_view(request):
-    context = {}
-    form = CreationForm(request.POST or None)
-    if request.method == "POST":
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return HttpResponseRedirect('/')
+class SignUp(CreateView):
+    form_class = CreationForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"
 
-    context['form'] = form
-    return render(request, 'registration/sign_up.html', context)
+
+class LoginView(FormView):
+    template_name = "registration/login.html"
+
+
+class LogoutView(TemplateView):
+    template_name = "registration/logged_out.html"
+
+
+class PasswordResetView(FormView):
+    template_name = "registration/password_reset_form.html"
+
+
+class PasswordResetDoneView(TemplateView):
+    template_name = "registration/password_reset_done.html"
+
+
+class PasswordResetConfirmView(FormView):
+    template_name = "registration/password_reset_confirm.html"
+
+
+class PasswordResetCompleteView(TemplateView):
+    template_name = "registration/password_reset_complete.html"
+
+
+class PasswordChangeView(FormView):
+    template_name = "registration/password_change_form.html"
+
+
+class PasswordChangeDoneView(TemplateView):
+    template_name = "registration/password_change_done.html"
+
+
+@login_required
+def profile(request):
+
+    return redirect(reverse('author_recipe', args=(request.user.username,)))
