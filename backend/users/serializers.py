@@ -1,7 +1,8 @@
-from .models import User
+from djoser.serializers import UserSerializer
 from recipe.models import Subscribe
 from rest_framework import serializers
-from djoser.serializers import UserSerializer
+
+from .models import User
 
 
 class CustomUserSerializer(UserSerializer):

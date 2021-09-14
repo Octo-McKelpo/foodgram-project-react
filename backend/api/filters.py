@@ -1,6 +1,6 @@
 import django_filters as filters
-from rest_framework.filters import SearchFilter as BaseSearchFilter
 from recipe.models import Recipe, Tag
+from rest_framework.filters import SearchFilter as BaseSearchFilter
 
 
 class RecipeFilter(filters.FilterSet):
@@ -27,5 +27,5 @@ class RecipeFilter(filters.FilterSet):
         return Recipe.objects.all()
 
 
-class SearchFilter(BaseSearchFilter):
+class NameSearchFilter(BaseSearchFilter):
     search_param = 'name'

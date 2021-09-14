@@ -1,10 +1,10 @@
-from drf_extra_fields.fields import Base64ImageField
 from django.contrib.auth import get_user_model
-from rest_framework.generics import get_object_or_404
-from rest_framework import serializers
 from django.db.models import F
+from drf_extra_fields.fields import Base64ImageField
 from recipe.models import (Favorite, Ingredient, IngredientInRecipe,
                            PurchaseList, Recipe, Subscribe, Tag)
+from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from users.serializers import UserSerializer
 
 User = get_user_model()
@@ -58,15 +58,28 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('author',)
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
-
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        if ingredients is None:
+            raise serializers.ValidationError({
+                'ingredients': ('Please add some ingredients')
+            })
         for ingredient in ingredients:
+            if ingredients.count(int(ingredient['id'])) > 1:
+                raise serializers.ValidationError({
+                    'ingredients': ('Please make sure your ingredients are not'
+                                    'dublicated')
+                })
             if ingredient['amount'] < 0:
                 raise serializers.ValidationError(
                     'Amount can not be a negative number'
                 )
+        data['ingredients'] = ingredients
+        return data
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         for ingredient in ingredients:
@@ -87,12 +100,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'ingredients' in self.initial_data:
             ingredients = validated_data.pop('ingredients')
-
-            for ingredient in ingredients:
-                if ingredient['amount'] < 0:
-                    raise serializers.ValidationError(
-                        'Amount can not be a negative number'
-                    )
             instance.ingredients.clear()
             for ingredient in ingredients:
                 obj = get_object_or_404(Ingredient,
