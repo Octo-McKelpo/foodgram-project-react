@@ -1,5 +1,4 @@
 import debug_toolbar
-from django.conf.urls import handler404, handler500
 from django.contrib import admin
 from django.urls import include, path
 

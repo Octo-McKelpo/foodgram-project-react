@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F
-from drf_extra_fields.fields import Base64ImageField
-from recipe.models import (Favorite, Ingredient, IngredientInRecipe,
-                           PurchaseList, Recipe, Subscribe, Tag)
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
+
+from drf_extra_fields.fields import Base64ImageField
+
+from recipe.models import (Favorite, Ingredient, IngredientInRecipe,
+                           PurchaseList, Recipe, Subscribe, Tag)
 from users.serializers import UserSerializer
 
 User = get_user_model()
@@ -77,11 +79,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         data['ingredients'] = ingredients
         return data
 
-    def create(self, validated_data):
+    def create_or_update(self, validated_data):
         ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
         for ingredient in ingredients:
             obj = get_object_or_404(Ingredient, id=ingredient['id'])
             amount = ingredient['amount']
@@ -95,26 +95,16 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 ingredient=obj,
                 defaults={'amount': amount}
             )
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
         return recipe
 
     def update(self, instance, validated_data):
         if 'ingredients' in self.initial_data:
-            ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
-            for ingredient in ingredients:
-                obj = get_object_or_404(Ingredient,
-                                        id=ingredient['id'])
-                amount = ingredient['amount']
-                if IngredientInRecipe.objects.filter(
-                        recipe=instance,
-                        ingredient=obj
-                ).exists():
-                    amount += F('amount')
-                IngredientInRecipe.objects.update_or_create(
-                    recipe=instance,
-                    ingredient=obj,
-                    defaults={'amount': amount}
-                )
         if 'tags' in self.initial_data:
             tags = validated_data.pop('tags')
             instance.tags.set(tags)
