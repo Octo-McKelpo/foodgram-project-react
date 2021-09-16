@@ -100,11 +100,13 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
+        self.create_or_update
         return recipe
 
     def update(self, instance, validated_data):
         if 'ingredients' in self.initial_data:
             instance.ingredients.clear()
+            self.create_or_update
         if 'tags' in self.initial_data:
             tags = validated_data.pop('tags')
             instance.tags.set(tags)
