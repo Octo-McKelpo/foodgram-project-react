@@ -8,7 +8,7 @@ services:
       - ./.env
 
   frontend:
-    image: octomckelpo/foodgram_frontend:latest
+    image: octomckelpo/foodgram_frontend:v1.0
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
