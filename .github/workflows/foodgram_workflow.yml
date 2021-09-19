@@ -15,11 +15,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd backend
         python -m pip install --upgrade pip
-        pip install flake8 flake8-broken-line flake8-isort
-        pip install -r requirements.txt
-        python -m flake8  --isort-show-traceback -v
+        pip install flake8 pep8-naming flake8-broken-line flake8-return
+        pip install -r backend/requirements.txt
+
+    - name: Test with flake8
+      run: |
+        python -m flake8 --ignore=R504,W504,W503,E129,E501
 
   build_backend:
     name: Push Docker image to Docker Hub
@@ -106,4 +108,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ${{ github.workflow }} успешно выполнен!
+          message: ${{ github.workflow }} успешно выполнен!F
