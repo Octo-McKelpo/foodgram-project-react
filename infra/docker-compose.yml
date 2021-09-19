@@ -8,11 +8,11 @@ services:
       - ./.env
 
   frontend:
-    image: octomckelpo/foodgram_frontend:v1.0
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     volumes:
-      - ../frontend/:/app/result_build/
-    depends_on:
-      - db
+      - ./frontend/:/app/result_build/
 
   backend:
     image: octomckelpo/foodgram_backend:latest
