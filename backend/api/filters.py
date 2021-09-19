@@ -1,6 +1,5 @@
 import django_filters as filters
 from rest_framework.filters import SearchFilter as BaseSearchFilter
-
 from recipe.models import Recipe, Tag
 
 
