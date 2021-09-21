@@ -49,8 +49,6 @@ class Recipe(models.Model):
         verbose_name="Cooking time", validators=[MinValueValidator(1)])
     image = models.ImageField(upload_to="recipes/", blank=True,
                               verbose_name="Recipe's image", default="")
-    slug = AutoSlugField(populate_from="name", allow_unicode=True, unique=True,
-                         editable=True, verbose_name="Slug")
     favorite = models.ManyToManyField(User, blank=True,
                                       related_name="favorite_recipes",
                                       verbose_name="Added to favorites",
