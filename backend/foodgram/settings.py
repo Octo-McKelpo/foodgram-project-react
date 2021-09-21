@@ -5,14 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
-DEBUG = os.environ.get('DEBUG') == '1'
-
 ALLOWED_HOSTS = ['*']
 
-if DEBUG:
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': lambda request: False if request.is_ajax() else True,
-    }
+DEBUG = True
 
 AUTH_USER_MODEL = 'users.User'
 AUTHOR_ITEMS = 3
