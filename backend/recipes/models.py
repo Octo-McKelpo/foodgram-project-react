@@ -45,9 +45,8 @@ class Recipe(models.Model):
         verbose_name="Recipe's ingredients"
     )
     description = models.TextField(max_length=1000, verbose_name="Description")
-    cook_time = models.PositiveSmallIntegerField(verbose_name="Cooking time",
-                                                 validators=[
-                                                     MinValueValidator(1)])
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name="Cooking time", validators=[MinValueValidator(1)])
     image = models.ImageField(upload_to="recipes/", blank=True,
                               verbose_name="Recipe's image", default="")
     slug = AutoSlugField(populate_from="name", allow_unicode=True, unique=True,
