@@ -4,7 +4,7 @@ from rest_framework.generics import get_object_or_404
 
 from drf_extra_fields.fields import Base64ImageField
 
-from recipe.models import (Favorite, Ingredient, IngredientInRecipe,
+from recipes.models import (Favorite, Ingredient, IngredientInRecipe,
                            PurchaseList, Recipe, Subscribe, Tag)
 from users.serializers import UserSerializer
 

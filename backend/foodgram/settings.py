@@ -18,7 +18,7 @@ ALLOWED_TAGS = ('breakfast', 'lunch', 'dinner',)
 INSTALLED_APPS = [
     'djoser',
     'users',
-    'recipe',
+    'recipes',
     'api',
     'rest_framework',
     'import_export',
