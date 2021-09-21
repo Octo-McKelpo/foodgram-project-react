@@ -5,19 +5,6 @@ from django.db import models
 from users.models import User
 
 
-class Ingredient(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Ingredient name",
-                            unique=True)
-    measurement_unit = models.CharField(max_length=30, verbose_name="Measure")
-
-    class Meta:
-        verbose_name = 'Ingredient'
-        verbose_name_plural = 'Ingredients'
-
-    def __str__(self):
-        return f'Ingredient: {self.name} ({self.measurement_unit})'
-
-
 class Tag(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tag's name")
     color = models.CharField(max_length=100, blank=True,
@@ -31,6 +18,19 @@ class Tag(models.Model):
 
     def __str__(self):
         return f'Tag: {self.name}'
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Ingredient name",
+                            unique=True)
+    measurement_unit = models.CharField(max_length=30, verbose_name="Measure")
+
+    class Meta:
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
+
+    def __str__(self):
+        return f'Ingredient: {self.name} ({self.measurement_unit})'
 
 
 class Recipe(models.Model):
