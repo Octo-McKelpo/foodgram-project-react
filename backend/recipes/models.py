@@ -44,7 +44,7 @@ class Recipe(models.Model):
         Ingredient, through="IngredientInRecipe", related_name="recipes",
         verbose_name="Recipe's ingredients"
     )
-    description = models.TextField(max_length=1000, verbose_name="Description")
+    text = models.TextField(max_length=1000, verbose_name="Description")
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Cooking time", validators=[MinValueValidator(1)])
     image = models.ImageField(upload_to="recipes/", blank=True,
