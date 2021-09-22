@@ -1,14 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from foodgram import settings
-
 
 class User(AbstractUser):
-    following = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
-                                       related_name="his_following",
-                                       verbose_name="I follow this user",
-                                       symmetrical=False)
+    email = models.EmailField(unique=True, max_length=254)
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    USERNAME_FIELD = 'email'
+
+    class Meta:
+        ordering = ('username', )
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     def __str__(self):
-        return f'{self.username}: {self.get_full_name()}'
+        return self.username
