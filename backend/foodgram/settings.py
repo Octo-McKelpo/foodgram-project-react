@@ -13,8 +13,6 @@ AUTH_USER_MODEL = 'users.User'
 AUTHOR_ITEMS = 3
 PER_PAGE = 3
 
-ALLOWED_TAGS = ('breakfast', 'lunch', 'dinner',)
-
 INSTALLED_APPS = [
     'djoser',
     'users',
