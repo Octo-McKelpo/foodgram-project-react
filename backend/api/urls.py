@@ -5,6 +5,8 @@ from .views import (DownloadPurchaseList, FavoriteViewSet, IngredientViewSet,
                     PurchaseListView, RecipeViewSet, SubscribeView, TagViewSet,
                     show_subscribs)
 
+app_name = 'api'
+
 router = DefaultRouter()
 
 router.register('tags', TagViewSet, basename='tags')
