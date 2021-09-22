@@ -4,26 +4,22 @@ from recipes.models import (Favorite, Ingredient, IngredientInRecipe,
                             PurchaseList, Recipe, Subscribe, Tag)
 
 
+class IngredientRecipeInLine(admin.TabularInline):
+    model = IngredientInRecipe
+
+
+@admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_filter = ("name",)
+    inlines = [IngredientRecipeInLine]
 
 
-class TagAdmin(admin.ModelAdmin):
-    pass
-
-
-class AmountAdmin(admin.ModelAdmin):
-    pass
-
-
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_filter = ("name",)
+    inlines = [IngredientRecipeInLine]
 
 
-admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(IngredientInRecipe)
 admin.site.register(Favorite)
+admin.site.register(IngredientInRecipe)
 admin.site.register(PurchaseList)
 admin.site.register(Subscribe)
+admin.site.register(Tag)
