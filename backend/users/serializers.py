@@ -1,7 +1,7 @@
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.models import Subscribe
+from recipes.models import Follow
 from .models import User
 
 
@@ -27,4 +27,4 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(user=request.user, author=obj).exists()
+        return Follow.objects.filter(user=request.user, author=obj).exists()

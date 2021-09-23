@@ -4,7 +4,7 @@ from rest_framework.generics import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe,
-                            PurchaseList, Recipe, Subscribe, Tag, User)
+                            PurchaseList, Recipe, Follow, Tag, User)
 from users.serializers import UserSerializer
 
 
@@ -201,32 +201,57 @@ class PurchaseListSerializer(serializers.ModelSerializer):
         ).data
 
 
-class SubscribersSerializer(serializers.ModelSerializer):
-    recipes = RecipeShortSerializer(many=True, read_only=True)
-    recipes_count = serializers.SerializerMethodField()
+class FollowRecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class FollowerSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='author.id')
+    email = serializers.ReadOnlyField(source='author.email')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = (
-            'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipes_count'
-        )
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(user=obj, author=request.user).exists()
+        return Follow.objects.filter(
+            user=obj.user, author=obj.author
+        ).exists()
+
+    def get_recipes(self, obj):
+        limit = 10
+        try:
+            limit = self.context['request'].query_params['recipes_limit']
+        except Exception:
+            pass
+        queryset = obj.recipes.all()[:int(limit)]
+        serializer = RecipeShortSerializer(queryset, many=True)
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.author).count()
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
+class FollowSerializer(serializers.ModelSerializer):
+    queryset = User.objects.all()
+    user = serializers.PrimaryKeyRelatedField(queryset=queryset)
+    author = serializers.PrimaryKeyRelatedField(queryset=queryset)
+
     class Meta:
-        model = Subscribe
-        fields = '__all__'
+        model = Follow
+        fields = ('user', 'author')
 
     def validate(self, attrs):
         request = self.context['request']
@@ -235,15 +260,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'You can not subscribe to yourself'
                 )
-            if Subscribe.objects.filter(
+            if Follow.objects.filter(
                     user=request.user,
                     author=attrs['author']
             ).exists():
                 raise serializers.ValidationError('You are already subscribed')
         return attrs
-
-    def to_representation(self, instance):
-        return SubscribersSerializer(
-            instance.author,
-            context={'request': self.context.get('request')}
-        ).data

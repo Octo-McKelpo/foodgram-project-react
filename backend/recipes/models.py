@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from users.models import User
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -122,7 +124,7 @@ class PurchaseList(models.Model):
         return f'Purchase: {self.recipe.name}'
 
 
-class Subscribe(models.Model):
+class Follow(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='User',
