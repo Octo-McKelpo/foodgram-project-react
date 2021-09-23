@@ -3,8 +3,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,8 +14,8 @@ from .paginators import PageNumberPaginatorModified
 from .permissions import AuthorOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, PurchaseListSerializer,
-                          SubscribersSerializer, SubscriptionSerializer,
-                          TagSerializer, RecipeListSerializer)
+                          SubscriptionSerializer, TagSerializer,
+                          RecipeListSerializer)
 
 User = get_user_model()
 
@@ -52,20 +50,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [AllowAny, ]
     filter_backends = [NameSearchFilter]
     search_fields = ['name', ]
-
-
-@api_view(['get'])
-def show_subscribs(request):
-    user_obj = User.objects.filter(following__user=request.user)
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    result_page = paginator.paginate_queryset(user_obj, request)
-    serializer = SubscribersSerializer(
-        result_page,
-        many=True,
-        context={'current_user': request.user}
-    )
-    return paginator.get_paginated_response(serializer.data)
 
 
 class SubscribeView(APIView):
