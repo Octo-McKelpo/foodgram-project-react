@@ -9,6 +9,8 @@ ALLOWED_HOSTS = ['*']
 
 DEBUG = True
 
+ALLOWED_TAGS = ('breakfast', 'lunch', 'dinner',)
+
 AUTH_USER_MODEL = 'users.User'
 AUTHOR_ITEMS = 3
 PER_PAGE = 3
