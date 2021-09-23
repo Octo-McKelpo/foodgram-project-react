@@ -1,16 +1,14 @@
 import django_filters as filters
 from rest_framework.filters import SearchFilter as BaseSearchFilter
 
-from recipes.models import Recipe, Tag
+from recipes.models import Recipe
 
 
 class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(method='get_favorites')
     is_in_shopping_cart = filters.BooleanFilter(method='get_in_shopping_cart')
-    tags = filters.ModelMultipleChoiceFilter(
-        field_name='tags__slug',
-        to_field_name='slug',
-        queryset=Tag.objects.all()
+    tags = filters.AllValuesMultipleFilter(
+        field_name='tags__slug'
     )
 
     class Meta:

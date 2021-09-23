@@ -1,4 +1,3 @@
-from autoslug import AutoSlugField
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -9,8 +8,8 @@ class Tag(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tag's name")
     color = models.CharField(max_length=100, blank=True,
                              verbose_name="Tag's color", default="")
-    slug = AutoSlugField(max_length=255, allow_unicode=True, unique=True,
-                         verbose_name="Tag's slug")
+    slug = models.SlugField(max_length=255, unique=True,
+                            verbose_name="Tag's slug")
 
     class Meta:
         verbose_name = 'Tag'
