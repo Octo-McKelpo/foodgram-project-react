@@ -69,54 +69,46 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        image = validated_data.pop('image')
         ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        tags = self.initial_data.get('tags')
+
+        for tag_id in tags:
+            recipe.tags.add(get_object_or_404(Tag, pk=tag_id))
+
         for ingredient in ingredients:
-            obj = get_object_or_404(Ingredient, id=ingredient['id'])
-            amount = ingredient['amount']
-            if IngredientInRecipe.objects.filter(
-                    recipe=recipe,
-                    ingredient=obj
-            ).exists():
-                amount += F('amount')
-            IngredientInRecipe.objects.update_or_create(
+            IngredientInRecipe.objects.create(
                 recipe=recipe,
-                ingredient=obj,
-                defaults={'amount': amount}
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
             )
+
         return recipe
 
     def update(self, instance, validated_data):
-        if 'ingredients' in self.initial_data:
-            ingredients = validated_data.pop('ingredients')
-            instance.ingredients.clear()
-            for ingredient in ingredients:
-                obj = get_object_or_404(Ingredient,
-                                        id=ingredient['id'])
-                amount = ingredient['amount']
-                if IngredientInRecipe.objects.filter(
-                        recipe=instance,
-                        ingredient=obj
-                ).exists():
-                    amount += F('amount')
-                IngredientInRecipe.objects.update_or_create(
-                    recipe=instance,
-                    ingredient=obj,
-                    defaults={'amount': amount}
-                )
-        if 'tags' in self.initial_data:
-            tags = validated_data.pop('tags')
-            instance.tags.set(tags)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time',
-            instance.cooking_time
-        )
-        instance.image = validated_data.get('image', instance.image)
+        instance.tags.clear()
+        tags = self.initial_data.get('tags')
+
+        for tag_id in tags:
+            instance.tags.add(get_object_or_404(Tag, pk=tag_id))
+
+        IngredientInRecipe.objects.filter(recipe=instance).delete()
+        for ingredient in validated_data.get('ingredients'):
+            ingredients_amounts = IngredientInRecipe.objects.create(
+                recipe=instance,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            )
+            ingredients_amounts.save()
+
+        if validated_data.get('image') is not None:
+            instance.image = validated_data.get('image')
+        instance.name = validated_data.get('name')
+        instance.text = validated_data.get('text')
+        instance.cooking_time = validated_data.get('cooking_time')
         instance.save()
+
         return instance
 
     def to_representation(self, instance):
