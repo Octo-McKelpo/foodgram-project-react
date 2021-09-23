@@ -97,31 +97,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['name', ]
 
 
-class SubscribeView(APIView):
-    def get(self, request, user_id):
-        user = request.user
-        data = {
-            'user': user.id,
-            'author': user_id
-        }
-        serializer = FollowSerializer(
-            data=data, context={'request': request}
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status.HTTP_201_CREATED)
-
-    def delete(self, request, user_id):
-        user = request.user
-        follow = get_object_or_404(
-            Follow,
-            user=user,
-            author_id=user_id
-        )
-        follow.delete()
-        return Response('Unsubscribed', status.HTTP_204_NO_CONTENT)
-
-
 class FavoriteViewSet(APIView):
     def get(self, request, recipe_id):
         user = request.user.id

@@ -11,7 +11,7 @@ DEBUG = True
 
 ALLOWED_TAGS = ('breakfast', 'lunch', 'dinner',)
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.CustomUser'
 AUTHOR_ITEMS = 3
 PER_PAGE = 3
 
