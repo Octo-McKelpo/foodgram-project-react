@@ -131,7 +131,8 @@ class Subscribe(models.Model):
     author = models.ForeignKey(
         User,
         verbose_name='Author',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='following'
     )
 
     class Meta:
