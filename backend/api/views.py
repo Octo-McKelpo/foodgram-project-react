@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from recipes.models import (Favorite, Ingredient, PurchaseList, Recipe,
                             Follow, Tag, User)
 from .filters import NameSearchFilter, RecipeFilter
-from .paginators import CustomPagination
+from .paginators import PageNumberPaginatorModified, CustomPagination
 from .permissions import AuthorOrReadOnly, IsOwnerOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, PurchaseListSerializer,
@@ -71,7 +71,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
-    pagination_class = None
+    pagination_class = PageNumberPaginatorModified
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -94,7 +94,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny, ]
     filter_backends = [NameSearchFilter]
-    search_fields = ['name', ]
+    search_fields = ['^name']
 
 
 class FavoriteViewSet(APIView):
