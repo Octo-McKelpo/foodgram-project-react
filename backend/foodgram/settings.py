@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'rest_framework.authtoken',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
