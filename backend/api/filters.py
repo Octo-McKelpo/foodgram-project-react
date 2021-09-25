@@ -1,5 +1,4 @@
 import django_filters as filters
-from rest_framework.filters import SearchFilter as BaseSearchFilter
 
 from recipes.models import Recipe, Ingredient, User
 
