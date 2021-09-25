@@ -23,7 +23,3 @@ class RecipeFilter(filters.FilterSet):
     class Meta:
         model = Recipe
         fields = ['tags', 'author']
-
-
-class NameSearchFilter(BaseSearchFilter):
-    search_param = 'name'
