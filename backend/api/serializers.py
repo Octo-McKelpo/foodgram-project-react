@@ -66,10 +66,10 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create_or_update(self, var1, var2):
-        for ingredient in var1:
+    def create_or_update(self, ingredients_list, recipes_list):
+        for ingredient in ingredients_list:
             IngredientInRecipe.objects.create(
-                recipe=var2,
+                recipe=recipes_list,
                 ingredient_id=ingredient.get('id'),
                 amount=ingredient.get('amount')
             )
