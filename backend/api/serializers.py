@@ -105,6 +105,18 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ).data
 
 
+class ShowRecipeIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
+
+    class Meta:
+        model = IngredientInRecipe
+        fields = ['id', 'name', 'measurement_unit', 'amount']
+
+
 class RecipeListSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     tags = TagSerializer(many=True)
@@ -118,6 +130,10 @@ class RecipeListSerializer(serializers.ModelSerializer):
             'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
         )
+
+    def get_ingredients(self, obj):
+        qs = IngredientInRecipe.objects.filter(recipe=obj)
+        return ShowRecipeIngredientSerializer(qs, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
