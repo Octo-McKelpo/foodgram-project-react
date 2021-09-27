@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recipes.models import (Favorite, Ingredient, PurchaseList, Recipe,
-                            Follow, Tag, User)
+                            Follow, Tag, IngredientInRecipe, User)
 from .filters import IngredientNameFilter, RecipeFilter
 from .paginators import PageNumberPaginatorModified
 from .permissions import AuthorOrReadOnly, IsOwnerOrAdminOrReadOnly
@@ -80,6 +80,66 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return RecipeListSerializer
         return CreateRecipeSerializer
+
+    @action(detail=True, permission_classes=[IsAuthenticated])
+    def shopping_cart(self, request, pk=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        data = {
+            'user': user.id,
+            'recipe': recipe.id,
+        }
+        serializer = PurchaseListSerializer(
+            data=data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk=None):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        favorites = get_object_or_404(
+            PurchaseList, user=user, recipe=recipe
+        )
+        favorites.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, permission_classes=[IsAuthenticated])
+    def download_shopping_cart(self, request):
+        user = request.user
+        shopping_cart = user.purchases.all()
+        list = {}
+        for item in shopping_cart:
+            recipe = item.recipe
+            ingredients = IngredientInRecipe.objects.filter(recipe=recipe)
+            for ingredient in ingredients:
+                amount = ingredient.amount
+                name = ingredient.ingredient.name
+                measurement_unit = ingredient.ingredient.measurement_unit
+                if name not in list:
+                    list[name] = {
+                        'measurement_unit': measurement_unit,
+                        'amount': amount
+                    }
+                else:
+                    list[name]['amount'] = (
+                        list[name]['amount'] + amount
+                    )
+
+        shopping_list = []
+        for item in list:
+            shopping_list.append(f'{item} - {list[item]["amount"]} '
+                                 f'{list[item]["measurement_unit"]} \n')
+        response = HttpResponse(shopping_list, 'Content-Type: text/plain')
+        response['Content-Disposition'] = 'attachment; filename="shoplist.txt"'
+
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -153,32 +213,3 @@ class PurchaseListView(APIView):
             'Recipe is deleted from purchase list',
             status.HTTP_204_NO_CONTENT
         )
-
-
-class DownloadPurchaseList(APIView):
-    def get(self, request):
-        shopping_cart = request.user.purchases.all()
-        purchase_list = {}
-        for purchase in shopping_cart:
-            ingredients = purchase.recipe.ingredientrecipe_set.all()
-            for ingredient in ingredients:
-                name = ingredient.ingredient.name
-                amount = ingredient.amount
-                unit = ingredient.ingredient.measurement_unit
-                if name not in purchase_list:
-                    purchase_list[name] = {
-                        'amount': amount,
-                        'unit': unit
-                    }
-                else:
-                    purchase_list[name]['amount'] = (purchase_list[name]
-                                                     ['amount'] + amount)
-        wishlist = []
-        for item in purchase_list:
-            wishlist.append(f'{item} ({purchase_list[item]["unit"]}) — '
-                            f'{purchase_list[item]["amount"]} \n')
-        wishlist.append('')
-        wishlist.append('Enjoy your purchases!')
-        response = HttpResponse(wishlist, 'Content-Type: application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="wishlist.pdf"'
-        return response
