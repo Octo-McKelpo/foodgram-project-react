@@ -158,27 +158,34 @@ class RecipeShortSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ('user', 'recipe')
 
-    def validate(self, attrs):
-        request = self.context['request']
-        if (request.method == 'GET'
-                and Favorite.objects.filter(
-                    user=request.user,
-                    recipe=attrs['recipe']
-                ).exists()):
+    def validate(self, data):
+        request = self.context.get('request')
+        recipe_id = data['recipe'].id
+        favorite_exists = Favorite.objects.filter(
+            user=request.user,
+            recipe__id=recipe_id
+        ).exists()
+
+        if request.method == 'GET' and favorite_exists:
             raise serializers.ValidationError(
-                'Recipe is already added to favorites'
+                'Recipe is already in favorites'
             )
-        return attrs
+
+        return data
 
     def to_representation(self, instance):
-        return RecipeShortSerializer(
+        request = self.context.get('request')
+        context = {'request': request}
+        return FollowRecipeSerializer(
             instance.recipe,
-            context={'request': self.context.get('request')}
-        ).data
+            context=context).data
 
 
 class PurchaseListSerializer(serializers.ModelSerializer):
@@ -235,14 +242,15 @@ class FollowerSerializer(serializers.ModelSerializer):
         ).exists()
 
     def get_recipes(self, obj):
-        limit = 10
-        try:
-            limit = self.context['request'].query_params['recipes_limit']
-        except Exception:
-            pass
-        queryset = obj.recipes.all()[:int(limit)]
-        serializer = RecipeShortSerializer(queryset, many=True)
-        return serializer.data
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit is not None:
+            queryset = Recipe.objects.filter(
+                author=obj.author
+            )[:int(limit)]
+
+        return FollowRecipeSerializer(queryset, many=True).data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
