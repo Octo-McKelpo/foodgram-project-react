@@ -199,7 +199,7 @@ class FavoriteViewSet(APIView):
         )
         favorite_recipe.delete()
         return Response(
-            'Recipe is deleted from favorites',
+            'Recipe is deleted from favorites.',
             status.HTTP_204_NO_CONTENT
         )
 
