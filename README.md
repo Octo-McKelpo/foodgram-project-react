@@ -41,3 +41,17 @@ docker-compose exec web python manage.py collectstatic --no-input
 ```
 docker-compose exec web python manage.py createsuperuser
 ```
+## Данные для входа:
+
+### Суперпользователь:
+
+* ## Email: octopush1997@gmail.com
+* ## Password: Octo Kisel
+
+### Тестовые пользователи:
+
+* ## Email: Octo-McKelpo@yandex.ru
+* ## Password: Octo Kisel
+
+* ## Email: jerma@gmail.com
+* ## Password: Octo Kisel
