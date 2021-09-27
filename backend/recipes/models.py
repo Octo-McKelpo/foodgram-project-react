@@ -113,8 +113,14 @@ class PurchaseList(models.Model):
     )
 
     class Meta:
+        ordering = ('-created_at',)
         verbose_name = 'Purchase'
         verbose_name_plural = 'Purchases'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='purchase_user_recipe_unique'
+            )
+        ]
 
     def __str__(self):
         return f'Purchase: {self.recipe.name}'

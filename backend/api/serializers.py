@@ -34,10 +34,13 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
     image = Base64ImageField(max_length=None, use_url=True)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = AddIngredientToRecipeSerializer(
         source='ingredients_amounts', many=True, read_only=True,)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -97,43 +100,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         instance.cooking_time = validated_data.get('cooking_time')
         instance.save()
         return instance
-
-    def to_representation(self, instance):
-        return RecipeListSerializer(
-            instance,
-            context={'request': self.context.get('request')}
-        ).data
-
-
-class ShowRecipeIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.id')
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
-    )
-
-    class Meta:
-        model = IngredientInRecipe
-        fields = ['id', 'name', 'measurement_unit', 'amount']
-
-
-class RecipeListSerializer(serializers.ModelSerializer):
-    author = UserSerializer()
-    tags = TagSerializer(many=True)
-    ingredients = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Recipe
-        fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favorited',
-            'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
-        )
-
-    def get_ingredients(self, obj):
-        qs = IngredientInRecipe.objects.filter(recipe=obj)
-        return ShowRecipeIngredientSerializer(qs, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')

@@ -1,3 +1,4 @@
+from django.db.models import Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,7 +17,7 @@ from .permissions import AuthorOrReadOnly, IsOwnerOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, PurchaseListSerializer,
                           FollowSerializer, FollowerSerializer, TagSerializer,
-                          RecipeListSerializer, UserSerializer)
+                          UserSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -76,10 +77,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
-            return RecipeListSerializer
-        return CreateRecipeSerializer
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_anonymous:
+            return Recipe.objects.all()
+
+        queryset = Recipe.objects.annotate(
+            is_favorited=Exists(Favorite.objects.filter(
+                user=user, recipe_id=OuterRef('pk')
+            )),
+            is_in_shopping_cart=Exists(PurchaseList.objects.filter(
+                user=user, recipe_id=OuterRef('pk')
+            ))
+        )
+
+        if self.request.GET.get('is_favorited'):
+            return queryset.filter(is_favorited=True)
+        elif self.request.GET.get('is_in_shopping_cart'):
+            return queryset.filter(is_in_shopping_cart=True)
+
+        return queryset
 
     @action(detail=True, permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):

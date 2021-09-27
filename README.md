@@ -1,5 +1,5 @@
 # Foodgram - сервис для публикации рецептов
-![example workflow](https://github.com/octomckelpo/foodgram-project-react/workflows/foodgram_workflow.yml/badge.svg)
+![foodgram-project-react workflow](https://github.com/Octo-McKelpo/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 Проект Foodgram позволяет пользователям публиковать рецепты, добавлять рецепты в избранное и список покупок, подписыватся на других пользователей и скачивать список продуктов.
 
