@@ -19,6 +19,4 @@ urlpatterns = [
          PurchaseListView.as_view(), name='add_recipe_to_shopping_cart'),
     path('recipes/<int:recipe_id>/favorite/',
          FavoriteViewSet.as_view(), name='add_recipe_to_favorite'),
-    path('recipes/<int:recipe_id>/edit', RecipeViewSet.as_view(),
-         name='recipe_edit')
 ]
