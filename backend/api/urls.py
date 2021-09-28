@@ -20,6 +20,6 @@ urlpatterns = [
          PurchaseListView.as_view(), name='add_recipe_to_shopping_cart'),
     path('recipes/<int:recipe_id>/favorite/',
          FavoriteViewSet.as_view(), name='add_recipe_to_favorite'),
-    path('recipe/<int:recipe_id>/edit', CreateRecipeSerializer.update,
+    path('recipes/<int:recipe_id>/edit', CreateRecipeSerializer.update,
          name='recipe_edit')
 ]
