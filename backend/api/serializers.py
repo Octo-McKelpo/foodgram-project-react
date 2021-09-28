@@ -52,7 +52,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         ingredients_set = set()
         if ingredients is None:
             raise serializers.ValidationError({
-                'ingredients': ('Please add some ingredients.')
+                'ingredients': ('Please add some ingredients')
             })
         for ingredient in ingredients:
             if int(ingredient.get('amount')) <= 0:
