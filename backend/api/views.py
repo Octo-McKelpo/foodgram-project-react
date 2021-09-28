@@ -10,13 +10,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recipes.models import (Favorite, Ingredient, PurchaseList, Recipe,
-                            Follow, IngredientInRecipe, User)
+                            Follow, Tag, IngredientInRecipe, User)
 from .filters import IngredientNameFilter, RecipeFilter
 from .paginators import PageNumberPaginatorModified
 from .permissions import IsOwnerOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, PurchaseListSerializer,
-                          FollowSerializer, FollowerSerializer,
+                          FollowSerializer, FollowerSerializer, TagSerializer,
                           UserSerializer)
 
 
@@ -158,6 +158,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = 'attachment; filename="shoplist.txt"'
 
         return response
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = (AllowAny, )
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
