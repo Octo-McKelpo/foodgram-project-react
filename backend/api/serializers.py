@@ -96,7 +96,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         tags = self.initial_data.get('tags')
         instance.tags.set(tags)
-        IngredientInRecipe.objects.filter(recipe=instance).all().delete()
+        IngredientInRecipe.objects.filter(recipe=instance).delete()
         self.create_or_update(validated_data.get('ingredients'), instance)
         instance.save()
         return instance

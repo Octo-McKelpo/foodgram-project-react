@@ -69,7 +69,7 @@ class CustomUserViewSet(UserViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = CreateRecipeSerializer
-    permission_classes = [IsOwnerOrAdminOrReadOnly]
+    permission_classes = (IsOwnerOrAdminOrReadOnly, )
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
     pagination_class = PageNumberPaginatorModified
@@ -163,14 +163,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (AllowAny)
+    permission_classes = (AllowAny, )
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (AllowAny)
+    permission_classes = (AllowAny, )
     pagination_class = None
     filter_backends = [IngredientNameFilter]
     search_fields = ['^name']
