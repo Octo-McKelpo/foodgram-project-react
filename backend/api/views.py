@@ -13,7 +13,7 @@ from recipes.models import (Favorite, Ingredient, PurchaseList, Recipe,
                             Follow, Tag, IngredientInRecipe, User)
 from .filters import IngredientNameFilter, RecipeFilter
 from .paginators import PageNumberPaginatorModified
-from .permissions import AuthorOrReadOnly, IsOwnerOrAdminOrReadOnly
+from .permissions import IsOwnerOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, PurchaseListSerializer,
                           FollowSerializer, FollowerSerializer, TagSerializer,
@@ -69,7 +69,7 @@ class CustomUserViewSet(UserViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = CreateRecipeSerializer
-    permission_classes = [AuthorOrReadOnly]
+    permission_classes = [IsOwnerOrAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
     pagination_class = PageNumberPaginatorModified
