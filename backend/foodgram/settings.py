@@ -7,7 +7,7 @@ SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
 ALLOWED_HOSTS = ['*']
 
-DEBUG = True
+DEBUG = False
 
 AUTH_USER_MODEL = 'users.CustomUser'
 AUTHOR_ITEMS = 3
