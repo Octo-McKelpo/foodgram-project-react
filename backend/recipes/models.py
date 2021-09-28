@@ -52,10 +52,6 @@ class Recipe(models.Model):
         verbose_name="Cooking time", validators=[MinValueValidator(1)])
     image = models.ImageField(upload_to="recipes/", blank=True,
                               verbose_name="Recipe's image", default="")
-    listed = models.ManyToManyField(User, blank=True,
-                                    related_name="listed_recipes",
-                                    verbose_name="Added to cart",
-                                    default="")
     pub_date = models.DateTimeField(
         verbose_name="Publication date",
         auto_now_add=True,
