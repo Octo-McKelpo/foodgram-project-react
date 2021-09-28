@@ -62,7 +62,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             id = ingredient.get('id')
             if id in ingredients_set:
                 raise serializers.ValidationError(
-                    'Please make sure your ingredients are not'
+                    'Please make sure your ingredients are not '
                     'dublicated.'
                 )
             ingredients_set.add(id)
