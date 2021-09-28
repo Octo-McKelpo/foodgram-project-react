@@ -57,13 +57,13 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             if int(ingredient.get('amount')) <= 0:
                 raise serializers.ValidationError(
-                    ('Please make sure your ingredients are not'
-                     'dublicated.')
+                    ('Amount can not be a negative number.')
                 )
             id = ingredient.get('id')
             if id in ingredients_set:
                 raise serializers.ValidationError(
-                    'Amount can not be a negative number.'
+                    'Please make sure your ingredients are not'
+                    'dublicated.'
                 )
             ingredients_set.add(id)
         data['ingredients'] = ingredients
@@ -88,11 +88,12 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        instance.tags.clear()
-        tags = self.initial_data.get('tags')
-        instance.tags.set(tags)
-        IngredientInRecipe.objects.filter(recipe=instance).delete()
-        self.create_or_update(validated_data.get('ingredients'), instance)
+        if 'ingredients' in self.initial_data:
+            instance.ingredients.clear()
+            self.create_or_update(validated_data.get('ingredients'), instance)
+        if 'tags' in self.initial_data:
+            tags = validated_data.pop('tags')
+            instance.tags.set(tags)
         if validated_data.get('image') is not None:
             instance.image = validated_data.get('image')
         instance.name = validated_data.get('name')
