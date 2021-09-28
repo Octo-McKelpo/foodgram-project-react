@@ -96,7 +96,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         for tag_id in tags:
             instance.tags.add(get_object_or_404(Tag, pk=tag_id))
 
-        IngredientInRecipe.objects.filter(recipe=instance).delete()
+        IngredientInRecipe.objects.filter(recipe=instance)
         for ingredient in validated_data.get('ingredients'):
             ingredients_amounts = IngredientInRecipe.objects.create(
                 recipe=instance,
