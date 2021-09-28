@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from drf_extra_fields.fields import Base64ImageField
@@ -88,12 +89,20 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if 'ingredients' in self.initial_data:
-            instance.ingredients.clear()
-            self.create_or_update(validated_data.get('ingredients'), instance)
-        if 'tags' in self.initial_data:
-            tags = validated_data.pop('tags')
-            instance.tags.set(tags)
+        instance.tags.clear()
+        tags = self.initial_data.get('tags')
+
+        for tag_id in tags:
+            instance.tags.add(get_object_or_404(Tag, pk=tag_id))
+
+        IngredientInRecipe.objects.filter(recipe=instance).delete()
+        for ingredient in validated_data.get('ingredients'):
+            ingredients_amounts = IngredientInRecipe.objects.create(
+                recipe=instance,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            )
+            ingredients_amounts.save()
         if validated_data.get('image') is not None:
             instance.image = validated_data.get('image')
         instance.name = validated_data.get('name')
