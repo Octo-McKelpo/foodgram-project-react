@@ -45,12 +45,12 @@ docker-compose exec web python manage.py createsuperuser
 
 ### Суперпользователь:
 
-* ## Email: octopush1997@gmail.com
+* ## Email: octo@gmail.com
 * ## Password: Octo Kisel
 
 ### Тестовые пользователи:
 
-* ## Email: Octo-McKelpo@yandex.ru
+* ## Email: fuse@gmail.com
 * ## Password: Octo Kisel
 
 * ## Email: jerma@gmail.com
